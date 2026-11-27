@@ -1,10 +1,14 @@
 # Preceptor
 
-Preceptor is a TypeScript library for building tutors and guided learning applications. It helps choose the next teaching step: explain a concept, ask a question, offer a hint or guide practice using lesson material.
+Preceptor is an instructional engine for guided learning, practice and review. Given a learning objective and an instructional mode, it helps a tutor decide when to explain a concept, ask the learner a question, offer a hint or suggest an exercise.
 
-The instructional policy is designed to work offline, without a language model. Applications can supply their own lesson sources, model and learner memory. No particular curriculum, model provider, database or hosted service is required.
+The policy core can produce a teaching plan without a language model. With an optional model, Preceptor can use authorized lesson material and learner memory to provide explanations and feedback suited to the learner's context.
 
-Preceptor is in early development. The architecture below describes the intended behavior; the package is not yet available on npm.
+Use it to build tutors and learning applications in any subject. Preceptor works independently of any particular curriculum, model provider, database or hosted service. The application controls access to learner data and retains authority over grading and academic progress.
+
+## Project status
+
+Preceptor is in early development. The architecture below describes the planned engine. The package is not yet available on npm.
 
 ## Use cases
 
@@ -17,11 +21,9 @@ Preceptor is in early development. The architecture below describes the intended
 
 A mathematics tutor could ask why a step in a proof is valid. A programming tutor could ask the learner to predict a function's return value before showing a worked example. Both can use the same instructional policy with different curricula and account systems.
 
-The application remains responsible for deciding whether a learner has met an official requirement, passed an assessment or earned a credential.
-
 ## Architecture
 
-Preceptor is a single library organized around a deterministic policy core and a session orchestrator. Applications connect external services through typed interfaces called ports, implementing them for their own lesson sources, models and memory stores.
+The library has a deterministic policy core and a session orchestrator. Applications connect their own lesson sources, models and memory stores through typed interfaces called ports.
 
 ```mermaid
 flowchart TB
@@ -105,7 +107,7 @@ sequenceDiagram
     end
 ```
 
-The effective tool permissions are the intersection of the mode's capability ceiling, host grants, learner consent and installed operations. The model receives descriptors for permitted operations. Only the dispatcher invokes the adapters, after checking permissions on every request, regardless of what the model has read in lesson or memory content.
+The effective tool permissions are the intersection of the mode's capability ceiling, host grants, learner consent and installed operations. The model receives descriptors for permitted operations. The dispatcher checks every tool request before invoking an adapter. Instructions embedded in lesson or memory content cannot grant additional permissions.
 
 Every run has limits for context, output, model requests, tool attempts, retries and elapsed time. Failed or cancelled model calls return explicit failure states. The application and its adapters remain responsible for remote cancellation, provider quotas and any costs already incurred.
 
@@ -137,7 +139,7 @@ The host can also supply advisory practice recommendations from an independent s
 
 Preceptor runs as a library within the consuming application. The application authenticates its users, binds adapters to the authorized learner and decides what context the session may access. It can use a local or remote model, its own memory backend or no persistent memory at all.
 
-The initial distribution target is a TypeScript ESM package for Node.js under the proposed name `@0xbuff/preceptor`. Installation instructions, public API examples and supported runtime versions will follow package verification. Browser and edge support are not yet established.
+The planned package, `@0xbuff/preceptor`, will target Node.js using TypeScript and ESM. Installation instructions, public API examples and supported runtime versions will follow package verification. Browser and edge support are not yet established.
 
 ## Development
 
