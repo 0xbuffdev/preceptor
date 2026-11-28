@@ -6,9 +6,9 @@ The instructional policy works without a language model. Applications can connec
 
 ## Status
 
-Preceptor is in development. This README describes the intended engine; the package is not yet available on npm.
+Preceptor is in development. The model-free instructional planner is implemented; model, lesson, memory and assessment-summary integrations are planned. The package is not yet available on npm.
 
-## Features
+## Intended features
 
 - Deterministic teaching strategies with no model or network required for planning.
 - Guided learning, ungraded practice, retrieval coaching and project defense preparation.
@@ -78,7 +78,7 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
-The full check runs strict type checking, Biome, Vitest, the tsdown build and an independent offline ESM and TypeScript package check. The current foundation has no instructional operations yet.
+The full check runs strict type checking, Biome, Vitest, the tsdown build and an independent offline ESM and TypeScript package check. The model-free planner is available in the local build. See [the policy guide](docs/policy.md).
 
 See [contributing](CONTRIBUTING.md), [security](SECURITY.md) and [source and release status](docs/source-rights.md).
 
