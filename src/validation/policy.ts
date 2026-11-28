@@ -5,7 +5,7 @@ import {
   type LessonReference,
   POLICY_REVISION,
 } from "../contracts/policy";
-import { CAPABILITIES, INTENTS, MODES } from "../policy/vocabulary";
+import { CAPABILITIES, INTENTS, MODES } from "../contracts/vocabulary";
 
 function record(
   value: unknown,
@@ -42,8 +42,13 @@ function identifier(value: unknown): value is string {
 
 function capabilities(value: unknown): Capability[] | undefined {
   if (!Array.isArray(value) || Object.getPrototypeOf(value) !== Array.prototype) return;
-  const length = Object.getOwnPropertyDescriptor(value, "length")?.value;
-  if (!Number.isSafeInteger(length) || length < 0 || length > CAPABILITIES.length) return;
+  const length: unknown = Object.getOwnPropertyDescriptor(value, "length")?.value;
+  if (
+    typeof length !== "number" ||
+    !Number.isSafeInteger(length) ||
+    length < 0 ||
+    length > CAPABILITIES.length
+  ) return;
   if (Reflect.ownKeys(value).length !== length + 1) return;
   const result: Capability[] = [];
   for (let index = 0; index < length; index++) {

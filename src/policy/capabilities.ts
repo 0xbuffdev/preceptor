@@ -1,5 +1,5 @@
 import type { Capability, CapabilityDenial, HostPolicy } from "../contracts/policy";
-import { CAPABILITIES } from "./vocabulary";
+import { CAPABILITIES } from "../contracts/vocabulary";
 
 function denial(policy: HostPolicy, capability: Capability): CapabilityDenial["reason"] | undefined {
   if (

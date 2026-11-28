@@ -99,7 +99,14 @@ describe("instructional policy", () => {
   });
 
   it("requires a lesson reference and public criteria for defense", () => {
-    const { lesson: _, ...withoutLesson } = host();
+    const withoutLesson = {
+      policyRevision: POLICY_REVISION,
+      sessionId: "without-lesson",
+      mode: "guided_learning",
+      grants: capabilities,
+      consent: capabilities,
+      installed: capabilities,
+    };
     expect(completed(withoutLesson).denials).toContainEqual({ capability: "lesson.read", reason: "lesson_unavailable" });
     expect(completed({ ...host("defense_preparation"), lesson: { documentRef: "private", revision: "1", visibility: "restricted" } }).denials).toContainEqual({ capability: "lesson.read", reason: "public_criteria_required" });
   });

@@ -1,4 +1,4 @@
-import type { Capability, InstructionIntent, InstructionMode } from "../contracts/policy";
+import type { Capability, InstructionIntent, InstructionMode } from "./policy";
 
 export const MODES = [
   "guided_learning",

@@ -75,9 +75,9 @@ for (const script of [
 const sourceEdges = {
   "index.ts": ["./contracts/policy", "./policy/plan"],
   "contracts/policy.ts": [],
-  "policy/vocabulary.ts": ["../contracts/policy"],
-  "validation/policy.ts": ["../contracts/policy", "../policy/vocabulary"],
-  "policy/capabilities.ts": ["../contracts/policy", "./vocabulary"],
+  "contracts/vocabulary.ts": ["./policy"],
+  "validation/policy.ts": ["../contracts/policy", "../contracts/vocabulary"],
+  "policy/capabilities.ts": ["../contracts/policy", "../contracts/vocabulary"],
   "strategy/select.ts": ["../contracts/policy"],
   "policy/plan.ts": [
     "../contracts/policy",
