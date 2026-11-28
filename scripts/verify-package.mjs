@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
-import { copyFile, mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { copyFile, mkdir, mkdtemp, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
 import path from "node:path";
@@ -102,18 +102,15 @@ try {
   assert.equal(item.name, manifest.name);
   assert.equal(item.version, manifest.version);
   assert.match(item.filename, /^[A-Za-z0-9._-]+\.tgz$/);
-  assert.deepEqual(
-    item.files.map((file) => file.path).sort(),
-    [
-      "CHANGELOG.md",
-      "COPYRIGHT.md",
-      "LICENSE",
-      "README.md",
-      "dist/index.d.ts",
-      "dist/index.js",
-      "package.json",
-    ],
-  );
+  assert.deepEqual(item.files.map((file) => file.path).sort(), [
+    "CHANGELOG.md",
+    "COPYRIGHT.md",
+    "LICENSE",
+    "README.md",
+    "dist/index.d.ts",
+    "dist/index.js",
+    "package.json",
+  ]);
 
   await writeFile(
     path.join(consumerDir, "package.json"),
@@ -135,7 +132,10 @@ try {
     consumerDir,
   );
   const modules = path.join(consumerDir, "node_modules");
-  assert.deepEqual((await readdir(modules)).filter((name) => !name.startsWith(".")), ["@0xbuff"]);
+  assert.deepEqual(
+    (await readdir(modules)).filter((name) => !name.startsWith(".")),
+    ["@0xbuff"],
+  );
   assert.deepEqual(await readdir(path.join(modules, "@0xbuff")), ["preceptor"]);
   const installed = path.join(modules, "@0xbuff/preceptor");
   assert.deepEqual(

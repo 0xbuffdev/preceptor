@@ -35,13 +35,13 @@ Effective tool permissions are restricted by the session mode, host grants, lear
 
 ### Instructional modes
 
-| Mode | Purpose |
-| --- | --- |
-| `guided_learning` | Explanations, questions and hints while studying |
-| `ungraded_practice` | Exercises and formative feedback |
-| `retrieval_coaching` | Recall and review of previously studied material |
-| `defense_preparation` | Rehearsal using authorized public criteria |
-| `assessment_locked` | Fixed public process guidance, without model or tool calls |
+| Mode                  | Purpose                                                    |
+| --------------------- | ---------------------------------------------------------- |
+| `guided_learning`     | Explanations, questions and hints while studying           |
+| `ungraded_practice`   | Exercises and formative feedback                           |
+| `retrieval_coaching`  | Recall and review of previously studied material           |
+| `defense_preparation` | Rehearsal using authorized public criteria                 |
+| `assessment_locked`   | Fixed public process guidance, without model or tool calls |
 
 For example, a programming tutor can ask a learner to predict a function's result before explaining its execution. A mathematics tutor can ask the learner to justify a step in a proof. Both use the same instructional policy with different lesson sources.
 
