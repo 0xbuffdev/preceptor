@@ -1,0 +1,50 @@
+{
+  "name": "@0xbuff/preceptor",
+  "version": "0.0.0",
+  "description": "Portable instructional engine for guided learning and practice",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "packageManager": "pnpm@11.2.2",
+  "engines": {
+    "node": ">=24"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/0xbuffdev/preceptor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/0xbuffdev/preceptor/issues"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "COPYRIGHT.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsdown",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "format": "biome format --write .",
+    "check:style": "biome check .",
+    "lint": "biome lint .",
+    "verify:package": "node scripts/verify-package.mjs",
+    "check": "pnpm typecheck && pnpm check:style && pnpm test && pnpm build && pnpm verify:package"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.6.8",
+    "@types/node": "24.19.2",
+    "tsdown": "0.23.7",
+    "typescript": "5.9.3",
+    "vitest": "4.1.12"
+  }
+}
