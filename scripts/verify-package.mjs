@@ -85,7 +85,15 @@ try {
   await mkdir(consumerDir);
   const packed = JSON.parse(
     run(
-      [npmEntry, "pack", "--offline", "--ignore-scripts", "--json", "--pack-destination", archiveDir],
+      [
+        npmEntry,
+        "pack",
+        "--offline",
+        "--ignore-scripts",
+        "--json",
+        "--pack-destination",
+        archiveDir,
+      ],
       root,
     ),
   );
