@@ -1,150 +1,73 @@
 # Preceptor
 
-Preceptor is an instructional engine for guided learning, practice and review. Given a learning objective and an instructional mode, it helps a tutor decide when to explain a concept, ask the learner a question, offer a hint or suggest an exercise.
+Preceptor is an instructional engine for building tutors and learning applications. It helps decide when to explain a concept, ask a question, offer a hint or suggest practice based on the learner's request and the purpose of the session.
 
-The policy core can produce a teaching plan without a language model. With an optional model, Preceptor can use authorized lesson material and learner memory to provide explanations and feedback suited to the learner's context.
+The instructional policy works without a language model. Applications can connect a model, lesson source and learner memory for contextual teaching. The host controls access to learner data and retains authority over assessment, grades and academic progress.
 
-Use it to build tutors and learning applications in any subject. Preceptor works independently of any particular curriculum, model provider, database or hosted service. The application controls access to learner data and retains authority over grading and academic progress.
+## Status
 
-## Project status
+Preceptor is in development. This README describes the intended engine; the package is not yet available on npm.
 
-Preceptor is in early development. The architecture below describes the planned engine. The package is not yet available on npm.
+## Features
 
-## Use cases
-
-- Guide a learner through a difficult concept without immediately giving away the answer.
-- Generate ungraded practice questions, hints and reflection prompts using an optional model.
-- Help learners recall previously studied material and rehearse explanations.
-- Prepare learners for a project defense using authorized public criteria.
-- Adapt instruction to learner-stated preferences and observed difficulties when memory is available.
-- Explain feedback from an assessment that the application has already recorded.
-
-A mathematics tutor could ask why a step in a proof is valid. A programming tutor could ask the learner to predict a function's return value before showing a worked example. Both can use the same instructional policy with different curricula and account systems.
+- Deterministic teaching strategies with no model or network required for planning.
+- Guided learning, ungraded practice, retrieval coaching and project defense preparation.
+- Optional model-generated explanations and feedback grounded in authorized lesson material.
+- Scoped tools with explicit permissions, resource limits and cancellation.
+- Optional learner memory with provenance, revision checks and protection against stale writes.
+- Read-only summaries of committed assessment decisions, including corrections and revocations.
 
 ## Architecture
 
-The library has a deterministic policy core and a session orchestrator. Applications connect their own lesson sources, models and memory stores through typed interfaces called ports.
-
 ```mermaid
-flowchart TB
-    H["Host application<br/>Identity, consent, permissions"]
-    subgraph P["Preceptor"]
-        A["Public API and validation"]
-        C["Instructional policy<br/>Modes, strategies, capabilities"]
-        S["Session orchestration<br/>Context, budgets, cancellation"]
-        D["Typed tool dispatcher"]
-        N["Narrative memory contract"]
-        E["Committed-result projection"]
-        A --> C
-        A --> S
-        A --> E
-        S --> C
-        S --> D
-        D --> N
-        E --> S
-    end
-    H --> A
-    subgraph X["Application-provided adapters"]
-        L["Authorized lesson source"]
-        M["Optional model"]
-        R["Optional memory store"]
-        Q["Optional practice suggestions"]
-    end
-    D --> L
-    S --> M
-    N --> R
-    D --> Q
+flowchart LR
+    H[Host application] --> S[Session engine]
+    S --> P[Instructional policy]
+    S --> M[Optional model]
+    S --> D[Tool dispatcher]
+    D --> A[Scoped host adapters]
+    S --> R[Advisory result]
 ```
 
-The policy core selects a teaching strategy and calculates permitted capabilities from validated inputs, without network or storage access. Session orchestration manages context, optional model calls and resource limits. Before invoking an adapter, the dispatcher validates the arguments and checks whether the operation is authorized.
+The host supplies the session mode, authorized context, permissions and limits. The policy selects a teaching strategy without performing I/O. For generative assistance, the session engine calls the injected model and validates its tool requests before the dispatcher invokes a host adapter.
 
-An application using the policy core alone receives a structured plan and fixed teaching prompts. Requests for generated feedback or model-based inspection are unavailable without a model.
+Effective tool permissions are restricted by the session mode, host grants, learner consent and installed operations. Lesson text, model responses and stored memory cannot grant additional permissions. The engine reports unavailable or partial results when a provider fails or a limit is reached.
 
 ### Instructional modes
-
-The host chooses the authorized mode for a session. A learner can request a different approach, but neither the learner nor the model can relax the host's restrictions.
 
 | Mode | Purpose |
 | --- | --- |
 | `guided_learning` | Explanations, questions and hints while studying |
-| `ungraded_practice` | Exercises and feedback that do not award credit |
-| `retrieval_coaching` | Recall and review of previously studied concepts |
+| `ungraded_practice` | Exercises and formative feedback |
+| `retrieval_coaching` | Recall and review of previously studied material |
 | `defense_preparation` | Rehearsal using authorized public criteria |
-| `assessment_locked` | Fixed public process guidance during restricted assessment |
+| `assessment_locked` | Fixed public process guidance, without model or tool calls |
 
-The assessment-locked mode does not invoke a model or retrieve lesson, transcript or memory context.
+For example, a programming tutor can ask a learner to predict a function's result before explaining its execution. A mathematics tutor can ask the learner to justify a step in a proof. Both use the same instructional policy with different lesson sources.
 
-### How a session works
-
-```mermaid
-sequenceDiagram
-    participant H as Host application
-    participant P as Preceptor
-    participant M as Model adapter
-    participant T as Scoped tool adapter
-
-    H->>P: Authorized session, request and limits
-    P->>P: Validate inputs and select strategy
-    alt Assessment locked
-        P-->>H: Fixed process guidance
-    else Model not configured
-        P-->>H: Deterministic plan
-    else Generative assistance requested
-        P->>M: Bounded context and allowed tool descriptors
-        M-->>P: Advisory text, tool requests or unavailable
-        opt Model requests a tool
-            P->>P: Validate permission, arguments and budget
-            alt Authorized and within limits
-                P->>T: Invoke scoped operation
-                T-->>P: Bounded result
-                P->>M: Validated tool result, if budget permits
-                M-->>P: Advisory response or next request
-            else Denied or invalid
-                P->>P: Record safe denial without invoking tool
-            end
-        end
-        P-->>H: Advisory result or explicit failure state
-    end
-```
-
-The effective tool permissions are the intersection of the mode's capability ceiling, host grants, learner consent and installed operations. The model receives descriptors for permitted operations. The dispatcher checks every tool request before invoking an adapter. Instructions embedded in lesson or memory content cannot grant additional permissions.
-
-Every run has limits for context, output, model requests, tool attempts, retries and elapsed time. Failed or cancelled model calls return explicit failure states. The application and its adapters remain responsible for remote cancellation, provider quotas and any costs already incurred.
-
-## Memory and academic records
-
-Optional learner memory stores preferences, recurring difficulties and instructional observations. These facts inform the next teaching step and carry no academic credit.
+### Memory and assessment
 
 ```mermaid
 flowchart LR
-    L["Learner"] --> H["Host application"]
-    H --> P["Preceptor"]
-    P --> G["Teaching guidance"]
-    P --> N["Model memory proposal"]
-    N --> V["Host validates scope,<br/>consent and revision"]
-    V --> R["Narrative memory"]
-    R --> P
-    H --> A["Official assessment record"]
-    A --> S["Authorized committed summary"]
-    S --> P
+    A[Official assessment record] --> S[Authorized summary]
+    S --> P[Preceptor]
+    P --> G[Teaching guidance]
+    P --> H[Host memory adapter]
+    H <--> N[Narrative memory]
 ```
 
-When a model proposes a memory change, the host assigns provenance and checks consent, scope and revision before storing it. Learner edits take precedence over delayed model proposals. Deleted facts must not reappear through stale callbacks or replay. The host owns physical erasure, export, backups and retention policy.
+Narrative memory holds instructional observations and learner preferences. The host enforces scope, consent, provenance and revision checks. Learner edits take precedence over delayed model proposals, and deleted facts must not be restored by replay.
 
-Official assessment records belong to the application. Preceptor may receive a minimal summary after an authorized decision has been committed, including corrections or revocations. It has no operation to write a grade, modify a rubric, issue a credential or change enrollment.
-
-The host can also supply advisory practice recommendations from an independent scheduler. They carry no academic credit.
+Official academic records remain separate. Preceptor can explain an authorized assessment summary, but cannot change grades, admit submissions or issue credentials. Review recommendations from an independent scheduler may inform instruction without granting academic credit.
 
 ## Integration
 
-Preceptor runs as a library within the consuming application. The application authenticates its users, binds adapters to the authorized learner and decides what context the session may access. It can use a local or remote model, its own memory backend or no persistent memory at all.
+Preceptor is designed to run inside the consuming application with caller-provided adapters. It requires no particular curriculum, model provider, database or cloud service. The application owns authentication, storage, transcript handling, privacy rights and provider costs.
 
-The planned package, `@0xbuff/preceptor`, will target Node.js using TypeScript and ESM. Installation instructions, public API examples and supported runtime versions will follow package verification. Browser and edge support are not yet established.
+The planned package name is `@0xbuff/preceptor`. Installation instructions and executable examples will be added once the public API and package have been verified.
 
 ## Development
 
-The source layout will separate public contracts, instructional policy, strategies, session orchestration, dispatch, ports, memory and committed-result summaries. Vitest and tsdown will be development dependencies for testing and building the ESM package with TypeScript declarations.
+The intended initial target is Node.js with TypeScript and ESM. The repository will use Vitest for tests and tsdown for packaging. The model-free core will be testable without provider credentials.
 
-Development starts with the repository and its build and test tooling. The policy core comes next, followed by model and lesson orchestration, memory, committed-result summaries and independent package verification.
-
-No model account or paid service will be required to develop or test the model-free core. Release and licensing decisions remain separate from implementation.
+Build instructions, contribution guidance and licensing information will be added as the source and release requirements are established.
