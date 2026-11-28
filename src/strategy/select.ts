@@ -39,8 +39,10 @@ export function fixedPrompt(strategy: TeachingStrategy, policy: HostPolicy): str
     return "Follow the assessment's published instructions. Ask the host about permitted process steps.";
   }
   if (policy.mode === "defense_preparation") {
-    if (strategy === "reflect") return "Reflect on how you would justify a design trade-off using the public criteria.";
-    if (strategy === "hint") return "Choose a public criterion and identify which part of your approach addresses it.";
+    if (strategy === "reflect")
+      return "Reflect on how you would justify a design trade-off using the public criteria.";
+    if (strategy === "hint")
+      return "Choose a public criterion and identify which part of your approach addresses it.";
     return "Choose a public criterion and rehearse explaining your reasoning and a trade-off.";
   }
   switch (strategy) {

@@ -7,8 +7,8 @@ export {
   type InstructionPlan,
   type InstructionRequest,
   type LessonReference,
-  POLICY_REVISION,
   type PlanningResult,
+  POLICY_REVISION,
   type TeachingStrategy,
 } from "./contracts/policy";
 export { planInstruction } from "./policy/plan";

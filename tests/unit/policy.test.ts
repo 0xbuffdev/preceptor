@@ -5,8 +5,8 @@ import {
   type InstructionIntent,
   type InstructionMode,
   type InstructionPlan,
-  planInstruction,
   POLICY_REVISION,
+  planInstruction,
   type TeachingStrategy,
 } from "../../src/index";
 
@@ -18,7 +18,14 @@ const capabilities: readonly Capability[] = [
   "practice.suggest",
 ];
 const intents: readonly InstructionIntent[] = [
-  "explain", "question", "hint", "practice", "reflect", "retrieve", "prepare", "process",
+  "explain",
+  "question",
+  "hint",
+  "practice",
+  "reflect",
+  "retrieve",
+  "prepare",
+  "process",
 ];
 const vectors: readonly {
   mode: InstructionMode;
@@ -26,10 +33,30 @@ const vectors: readonly {
   allowed: readonly InstructionIntent[];
   ceiling: readonly Capability[];
 }[] = [
-  { mode: "guided_learning", default: "explain", allowed: ["explain", "question", "hint", "practice", "reflect"], ceiling: capabilities },
-  { mode: "ungraded_practice", default: "practice", allowed: ["question", "hint", "practice", "reflect"], ceiling: capabilities },
-  { mode: "retrieval_coaching", default: "retrieve", allowed: ["retrieve", "question", "reflect", "practice"], ceiling: capabilities },
-  { mode: "defense_preparation", default: "question", allowed: ["question", "reflect", "hint"], ceiling: ["lesson.read", "memory.recall", "practice.suggest"] },
+  {
+    mode: "guided_learning",
+    default: "explain",
+    allowed: ["explain", "question", "hint", "practice", "reflect"],
+    ceiling: capabilities,
+  },
+  {
+    mode: "ungraded_practice",
+    default: "practice",
+    allowed: ["question", "hint", "practice", "reflect"],
+    ceiling: capabilities,
+  },
+  {
+    mode: "retrieval_coaching",
+    default: "retrieve",
+    allowed: ["retrieve", "question", "reflect", "practice"],
+    ceiling: capabilities,
+  },
+  {
+    mode: "defense_preparation",
+    default: "question",
+    allowed: ["question", "reflect", "hint"],
+    ceiling: ["lesson.read", "memory.recall", "practice.suggest"],
+  },
   { mode: "assessment_locked", default: "pause", allowed: [], ceiling: [] },
 ];
 
@@ -64,7 +91,11 @@ describe("instructional policy", () => {
         const allowed = vector.allowed.includes(intent);
         expect(result.strategy).toBe(allowed ? intent : vector.default);
         expect(result.reason).toBe(
-          vector.mode === "assessment_locked" ? "assessment_locked" : allowed ? "requested_intent" : "unsupported_intent",
+          vector.mode === "assessment_locked"
+            ? "assessment_locked"
+            : allowed
+              ? "requested_intent"
+              : "unsupported_intent",
         );
         expect(result.nextActions[0]?.text.length).toBeGreaterThan(0);
       }
@@ -74,13 +105,22 @@ describe("instructional policy", () => {
       for (let grant = 0; grant < 32; grant++) {
         for (let consent = 0; consent < 32; consent++) {
           for (let installed = 0; installed < 32; installed++) {
-            const policy = { ...host(vector.mode), grants: subset(grant).reverse(), consent: subset(consent), installed: subset(installed) };
+            const policy = {
+              ...host(vector.mode),
+              grants: subset(grant).reverse(),
+              consent: subset(consent),
+              installed: subset(installed),
+            };
             const result = completed(policy);
-            const expected = capabilities.filter((capability, index) =>
-              vector.ceiling.includes(capability) && ((grant & consent & installed) & (1 << index)) !== 0,
+            const expected = capabilities.filter(
+              (capability, index) =>
+                vector.ceiling.includes(capability) &&
+                (grant & consent & installed & (1 << index)) !== 0,
             );
-            if (result.capabilities.join() !== expected.join()) throw new Error("Capability intersection mismatch");
-            if (result.denials.length !== capabilities.length - expected.length) throw new Error("Denial count mismatch");
+            if (result.capabilities.join() !== expected.join())
+              throw new Error("Capability intersection mismatch");
+            if (result.denials.length !== capabilities.length - expected.length)
+              throw new Error("Denial count mismatch");
           }
         }
       }
@@ -88,7 +128,12 @@ describe("instructional policy", () => {
   }
 
   it("reports missing capability reasons without substituting permissions", () => {
-    const result = completed({ ...host(), grants: ["lesson.read", "memory.recall", "memory.remember"], consent: ["lesson.read", "memory.remember"], installed: ["lesson.read"] });
+    const result = completed({
+      ...host(),
+      grants: ["lesson.read", "memory.recall", "memory.remember"],
+      consent: ["lesson.read", "memory.remember"],
+      installed: ["lesson.read"],
+    });
     expect(result.capabilities).toEqual(["lesson.read"]);
     expect(result.denials).toEqual([
       { capability: "memory.recall", reason: "no_consent" },
@@ -107,8 +152,16 @@ describe("instructional policy", () => {
       consent: capabilities,
       installed: capabilities,
     };
-    expect(completed(withoutLesson).denials).toContainEqual({ capability: "lesson.read", reason: "lesson_unavailable" });
-    expect(completed({ ...host("defense_preparation"), lesson: { documentRef: "private", revision: "1", visibility: "restricted" } }).denials).toContainEqual({ capability: "lesson.read", reason: "public_criteria_required" });
+    expect(completed(withoutLesson).denials).toContainEqual({
+      capability: "lesson.read",
+      reason: "lesson_unavailable",
+    });
+    expect(
+      completed({
+        ...host("defense_preparation"),
+        lesson: { documentRef: "private", revision: "1", visibility: "restricted" },
+      }).denials,
+    ).toContainEqual({ capability: "lesson.read", reason: "public_criteria_required" });
   });
 
   it("is deterministic, detached from the input and insensitive to capability ordering", () => {
@@ -123,9 +176,13 @@ describe("instructional policy", () => {
 
   it("uses only fixed non-credit prompts and explicitly lacks generation", () => {
     expect(planInstruction(host(), { assistance: "generate" })).toEqual({
-      status: "unavailable", policyRevision: POLICY_REVISION, reason: "model_unavailable",
+      status: "unavailable",
+      policyRevision: POLICY_REVISION,
+      reason: "model_unavailable",
     });
-    expect(completed({ ...host(), signals: { difficulty: "high" } }).nextActions).not.toEqual(completed(host()).nextActions);
+    expect(completed({ ...host(), signals: { difficulty: "high" } }).nextActions).not.toEqual(
+      completed(host()).nextActions,
+    );
     expect(completed(host()).nextActions[0]?.kind).toBe("fixed_prompt");
   });
 });

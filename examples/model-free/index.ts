@@ -1,4 +1,4 @@
-import { type HostPolicy, planInstruction, POLICY_REVISION } from "@0xbuff/preceptor";
+import { type HostPolicy, POLICY_REVISION, planInstruction } from "@0xbuff/preceptor";
 
 const host: HostPolicy = {
   policyRevision: POLICY_REVISION,

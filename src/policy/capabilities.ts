@@ -1,7 +1,10 @@
 import type { Capability, CapabilityDenial, HostPolicy } from "../contracts/policy";
 import { CAPABILITIES } from "../contracts/vocabulary";
 
-function denial(policy: HostPolicy, capability: Capability): CapabilityDenial["reason"] | undefined {
+function denial(
+  policy: HostPolicy,
+  capability: Capability,
+): CapabilityDenial["reason"] | undefined {
   if (
     policy.mode === "assessment_locked" ||
     (policy.mode === "defense_preparation" &&

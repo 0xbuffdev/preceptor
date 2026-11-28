@@ -1,4 +1,9 @@
-import { type HostPolicy, type InstructionRequest, POLICY_REVISION, type PlanningResult } from "../contracts/policy";
+import {
+  type HostPolicy,
+  type InstructionRequest,
+  type PlanningResult,
+  POLICY_REVISION,
+} from "../contracts/policy";
 import { fixedPrompt, selectStrategy } from "../strategy/select";
 import { validateHostPolicy, validateRequest } from "../validation/policy";
 import { effectiveCapabilities } from "./capabilities";

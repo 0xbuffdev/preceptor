@@ -7,10 +7,7 @@ import {
 } from "../contracts/policy";
 import { CAPABILITIES, INTENTS, MODES } from "../contracts/vocabulary";
 
-function record(
-  value: unknown,
-  allowed: readonly string[],
-): Record<string, unknown> | undefined {
+function record(value: unknown, allowed: readonly string[]): Record<string, unknown> | undefined {
   if (typeof value !== "object" || value === null || Array.isArray(value)) return;
   const prototype = Object.getPrototypeOf(value);
   if (prototype !== Object.prototype && prototype !== null) return;
@@ -48,7 +45,8 @@ function capabilities(value: unknown): Capability[] | undefined {
     !Number.isSafeInteger(length) ||
     length < 0 ||
     length > CAPABILITIES.length
-  ) return;
+  )
+    return;
   if (Reflect.ownKeys(value).length !== length + 1) return;
   const result: Capability[] = [];
   for (let index = 0; index < length; index++) {

@@ -92,7 +92,8 @@ async function listSource(directory, prefix = "") {
   const paths = [];
   for (const entry of await readdir(directory, { withFileTypes: true })) {
     const relative = prefix + entry.name;
-    if (entry.isDirectory()) paths.push(...(await listSource(path.join(directory, entry.name), relative + "/")));
+    if (entry.isDirectory())
+      paths.push(...(await listSource(path.join(directory, entry.name), `${relative}/`)));
     else {
       assert.ok(entry.isFile(), "Unexpected non-file source entry");
       paths.push(relative);

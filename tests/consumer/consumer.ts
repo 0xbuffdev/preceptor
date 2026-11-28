@@ -1,8 +1,8 @@
 import {
   type HostPolicy,
   type InstructionRequest,
-  planInstruction,
   POLICY_REVISION,
+  planInstruction,
 } from "@0xbuff/preceptor";
 
 const host: HostPolicy = {
