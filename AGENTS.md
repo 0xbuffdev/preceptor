@@ -44,9 +44,18 @@ Preceptor is a portable instructional engine. It selects teaching strategies and
 
 ## Toolchain and validation
 
-Use strict TypeScript, ESM, tsdown and Vitest as established by the source foundation. Keep build and test tooling development-only; typecheck independently of bundling. Follow repository-configured formatting and package-manager versions. Do not edit generated `dist/` files.
+Use Node.js 24+, pnpm 11.2.2, TypeScript 5.9.3, ESM, tsdown, Vitest and Biome as configured in the repository. Keep tooling development-only; typecheck independently of bundling. Follow Biome and do not edit generated `dist/` files.
 
-Before tooling exists, follow the bootstrap ticket; do not assume Assay's runtime versions, scripts or formatter apply here. Once the foundation lands, keep this section updated with the actual root install, focused test, full validation and packed-consumer commands from `package.json` and CI.
+From the repository root:
+
+```sh
+corepack enable
+pnpm install --frozen-lockfile
+pnpm exec vitest run tests/unit/foundation.test.ts
+pnpm check
+```
+
+Use `pnpm format` to format files and `pnpm check:style` for non-mutating style checks. Run `pnpm build` then `pnpm verify:package` for standalone archive verification.
 
 - Add focused positive, negative and boundary tests for every changed behavior. Use deterministic fixtures, exhaustive mode/capability tables, malformed inputs, adversarial context, budget and cancellation cases, scoped memory races, deletion replay and summary revision conflicts as applicable.
 - Use synthetic data and private-data canaries; never use real learner records, credentials, hidden assessment cases or private prompts in fixtures or package artifacts.

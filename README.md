@@ -68,6 +68,16 @@ The planned package name is `@0xbuff/preceptor`. Installation instructions and e
 
 ## Development
 
-The intended initial target is Node.js with TypeScript and ESM. The repository will use Vitest for tests and tsdown for packaging. The model-free core will be testable without provider credentials.
+Requires Node.js 24 or later, pnpm 11.2.2 and TypeScript 5.9.3 for development.
 
-Build instructions, contribution guidance and licensing information will be added as the source and release requirements are established.
+```sh
+git clone https://github.com/0xbuffdev/preceptor.git
+cd preceptor
+corepack enable
+pnpm install --frozen-lockfile
+pnpm check
+```
+
+The full check runs strict type checking, Biome, Vitest, the tsdown build and an independent offline ESM and TypeScript package check. The current foundation has no instructional operations yet.
+
+See [contributing](CONTRIBUTING.md), [security](SECURITY.md) and [source and release status](docs/source-rights.md).
