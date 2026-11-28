@@ -71,11 +71,57 @@ for (const script of [
 ]) {
   assert.ok(!Object.hasOwn(manifest.scripts, script), script);
 }
-// This guard describes the foundation only. Later accepted tickets extend it
-// with module dependency and public export checks for their actual code.
-assert.deepEqual(await readdir(path.join(root, "src")), ["index.ts"]);
-const source = await readFile(path.join(root, "src/index.ts"), "utf8");
-assert.equal(source.replace(/^\/\/.*$/gm, "").trim(), "export {};");
+// Check the explicit policy-only module graph before packaging.
+const sourceEdges = {
+  "index.ts": ["./contracts/policy", "./policy/plan"],
+  "contracts/policy.ts": [],
+  "policy/vocabulary.ts": ["../contracts/policy"],
+  "validation/policy.ts": ["../contracts/policy", "../policy/vocabulary"],
+  "policy/capabilities.ts": ["../contracts/policy", "./vocabulary"],
+  "strategy/select.ts": ["../contracts/policy"],
+  "policy/plan.ts": [
+    "../contracts/policy",
+    "../strategy/select",
+    "../validation/policy",
+    "./capabilities",
+  ],
+};
+const ts = require("typescript");
+const src = path.join(root, "src");
+async function listSource(directory, prefix = "") {
+  const paths = [];
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const relative = prefix + entry.name;
+    if (entry.isDirectory()) paths.push(...(await listSource(path.join(directory, entry.name), relative + "/")));
+    else {
+      assert.ok(entry.isFile(), "Unexpected non-file source entry");
+      paths.push(relative);
+    }
+  }
+  return paths;
+}
+assert.deepEqual((await listSource(src)).sort(), Object.keys(sourceEdges).sort());
+for (const [file, allowed] of Object.entries(sourceEdges)) {
+  const contents = await readFile(path.join(src, file), "utf8");
+  const ast = ts.createSourceFile(file, contents, ts.ScriptTarget.Latest, true);
+  const imports = [];
+  function visit(node) {
+    if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) {
+      if (node.moduleSpecifier) {
+        assert.ok(ts.isStringLiteral(node.moduleSpecifier));
+        imports.push(node.moduleSpecifier.text);
+      }
+    }
+    if (ts.isImportEqualsDeclaration(node)) assert.fail("Import equals is not allowed");
+    if (ts.isCallExpression(node)) {
+      assert.notEqual(node.expression.kind, ts.SyntaxKind.ImportKeyword, "Dynamic import");
+      if (ts.isIdentifier(node.expression)) assert.notEqual(node.expression.text, "require");
+    }
+    ts.forEachChild(node, visit);
+  }
+  visit(ast);
+  assert.deepEqual(imports.sort(), [...allowed].sort(), file);
+}
 
 const workspace = await mkdtemp(path.join(tmpdir(), "preceptor-consumer-"));
 try {
