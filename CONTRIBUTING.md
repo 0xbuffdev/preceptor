@@ -12,4 +12,4 @@ pnpm check
 
 Use `pnpm test` for the full test suite, `pnpm format` to format files and `pnpm check:style` for non-mutating style checks. The full check also builds the package and installs its local archive in an independent offline consumer.
 
-Open focused pull requests with the approved scope, tests and any outstanding limitations. Use synthetic learner data in tests. Source and contribution rights are pending separate approval; do not transfer private code or contribute material without confirmed rights.
+Open focused pull requests with the approved scope, tests and any outstanding limitations. Use synthetic learner data in tests. Contributions must comply with [Apache-2.0](LICENSE). Do not transfer private code or contribute material without confirmed rights.

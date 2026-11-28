@@ -40,7 +40,7 @@ function run(args, cwd) {
 const manifest = JSON.parse(await readFile(path.join(root, "package.json"), "utf8"));
 assert.equal(manifest.name, "@0xbuff/preceptor");
 assert.equal(manifest.private, true);
-assert.equal(manifest.license, "UNLICENSED");
+assert.equal(manifest.license, "Apache-2.0");
 assert.equal(manifest.type, "module");
 assert.deepEqual(manifest.exports, {
   ".": { types: "./dist/index.d.ts", import: "./dist/index.js" },
@@ -104,7 +104,15 @@ try {
   assert.match(item.filename, /^[A-Za-z0-9._-]+\.tgz$/);
   assert.deepEqual(
     item.files.map((file) => file.path).sort(),
-    ["CHANGELOG.md", "README.md", "dist/index.d.ts", "dist/index.js", "package.json"],
+    [
+      "CHANGELOG.md",
+      "COPYRIGHT.md",
+      "LICENSE",
+      "README.md",
+      "dist/index.d.ts",
+      "dist/index.js",
+      "package.json",
+    ],
   );
 
   await writeFile(
@@ -133,6 +141,20 @@ try {
   assert.deepEqual(
     JSON.parse(await readFile(path.join(installed, "package.json"), "utf8")),
     manifest,
+  );
+  for (const file of ["LICENSE", "COPYRIGHT.md"]) {
+    assert.equal(
+      await readFile(path.join(installed, file), "utf8"),
+      await readFile(path.join(root, file), "utf8"),
+    );
+  }
+  assert.match(
+    await readFile(path.join(installed, "LICENSE"), "utf8"),
+    /Apache License\s+Version 2\.0/,
+  );
+  assert.match(
+    await readFile(path.join(installed, "COPYRIGHT.md"), "utf8"),
+    /Copyright 2026 0xBUFF/,
   );
   for (const file of ["consumer.mjs", "consumer.ts"]) {
     await copyFile(path.join(root, "tests/consumer", file), path.join(consumerDir, file));

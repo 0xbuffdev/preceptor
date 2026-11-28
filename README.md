@@ -81,3 +81,7 @@ pnpm check
 The full check runs strict type checking, Biome, Vitest, the tsdown build and an independent offline ESM and TypeScript package check. The current foundation has no instructional operations yet.
 
 See [contributing](CONTRIBUTING.md), [security](SECURITY.md) and [source and release status](docs/source-rights.md).
+
+## License
+
+[Apache-2.0](LICENSE). See [copyright and attribution](COPYRIGHT.md).

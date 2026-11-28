@@ -66,5 +66,5 @@ Use `pnpm format` to format files and `pnpm check:style` for non-mutating style 
 
 - Prioritize fail-open permissions, assessment-lock bypass, prompt-driven authority changes, scope or privacy leaks, stale memory resurrection, forged credit, unbounded execution, incorrect failure states and dependency violations. Include file/line, triggering condition, impact and a testable correction.
 - PRs must identify the ticket, requirement coverage, tests and outstanding limitations. Do not mark a ticket done before required review, merge and acceptance evidence.
-- Source rights, licensing, package publication and host deployment have separate approvals. Do not infer a license from a proposal or another repository. Verify the exact candidate artifact, provenance and independent consumer before release.
+- Source rights, licensing, package publication and host deployment have separate approvals. Preserve Apache-2.0 licensing and copyright notices. Do not infer contributor rights from the license. Verify the exact candidate artifact, provenance and independent consumer before release.
 - No merge, publication, version tag, deployment, signing on behalf of the maintainer or ownership/visibility change without explicit authorization.

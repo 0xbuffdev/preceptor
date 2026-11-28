@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Portable instructional engine for guided learning and practice",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "Apache-2.0",
   "type": "module",
   "packageManager": "pnpm@11.2.2",
   "engines": {
@@ -25,7 +25,9 @@
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE",
+    "COPYRIGHT.md"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
